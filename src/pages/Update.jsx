@@ -34,16 +34,16 @@ const Update = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-  
+
     if (data.success) {
       redirect("/all");
     }
     try {
-        const { data } = await axiosInstance.patch(`/${goalId}`, {
-          title,
-          description,
-          progress,
-        });
+      const { data } = await axiosInstance.patch(`/${goalId}`, {
+        title: title.toLowerCase,
+        description,
+        progress,
+      });
     } catch (error) {
       console.log();
       toast.error("You cannot change to an existing title");
