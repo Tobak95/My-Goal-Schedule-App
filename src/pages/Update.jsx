@@ -6,14 +6,52 @@ import Loading from "../components/Loading";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import { axiosInstance } from "../axiosInstance";
 
 const Update = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [progress, setProgress] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const redirect = useNavigate();
+  const { goalId } = useParams();
 
+  useEffect(() => {
+    const getGoal = async () => {
+      const { data } = await axiosInstance(`/${goalId}`);
+      console.log(data);
+      setIsLoading(false);
+      setTitle(data.goal.title);
+      setDescription(data.goal.description);
+      setProgress(data.goal.progress);
+    };
+    getGoal();
+  }, [goalId]);
+
+  //this is where the patch effect would come in.. thi s is to help the user update his goal record
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+  
+    if (data.success) {
+      redirect("/all");
+    }
+    try {
+        const { data } = await axiosInstance.patch(`/${goalId}`, {
+          title,
+          description,
+          progress,
+        });
+    } catch (error) {
+      console.log();
+      toast.error("You cannot change to an existing title");
+      setIsSubmitting(false);
+    }
+  };
+
+  //on the imput field and the text area we have a write a required function
   return (
     <>
       <GoalHeader heading="Progress" />
@@ -23,7 +61,7 @@ const Update = () => {
         <div className="container d-flex justify-content-between align-items-center mt-3 pb-3 gap-lg-2">
           <div className="main-form py-5 px-1 ps-lg-2 ps-xl-3 pe-xl-3 rounded-2">
             <ToastContainer />
-            <form className="create-form">
+            <form onSubmit={handleUpdate} className="create-form">
               <div className="mt-2">
                 <input
                   type="text"
@@ -31,6 +69,7 @@ const Update = () => {
                   className="bg-transparent"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
+                  required
                 />
               </div>
               <div className="mt-5">
@@ -43,6 +82,7 @@ const Update = () => {
                   rows="10"
                   placeholder="Goal Description"
                   className="bg-transparent"
+                  required
                 ></textarea>
               </div>
               <div>
@@ -54,10 +94,13 @@ const Update = () => {
                   min="0"
                   max="100"
                   className="bg-transparent mt-2"
+                  required
                 />
               </div>
               <div className="mt-2">
-                <button className="blue-bg p-2">Update</button>
+                <button className="blue-bg p-2">
+                  {isSubmitting ? "Updating..." : "Update"}
+                </button>
               </div>
             </form>
           </div>

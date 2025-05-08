@@ -3,9 +3,20 @@ import Progress from "./Progress";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
+import { axiosInstance } from "../axiosInstance";
 
 const SingleGoal = ({ title, description, progress, _id }) => {
   const path = useLocation().pathname;
+  const handleDelete = async (goalId) => {
+    try {
+      const { data } = await axiosInstance.delete(`/${goalId}`);
+      if (data.success) {
+        window.location.reload();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="border-bottom border-3 border-secondary-subtle pb-4 px-4 mt-4 shadow-sm">
@@ -26,7 +37,10 @@ const SingleGoal = ({ title, description, progress, _id }) => {
               {path === "/completed" ? "Edit" : "Update Progress"}{" "}
             </Link>{" "}
           </button>
-          <button className=" border-none bg-transparent transparent delbtn">
+          <button
+            onClick={() => handleDelete(_id)}
+            className=" border-none bg-transparent transparent delbtn"
+          >
             <RiDeleteBinLine /> Delete{" "}
           </button>
         </div>
